@@ -107,7 +107,7 @@ for table_location, tdata in data_dict.items():
     download_file(s3, file_uri, destination)
     parquet_data = pq.read_table(destination)
     df = parquet_data.to_pandas()
-    table_dict = {"name": table_name, "location": f"s3://{S3_BUCKET}/{table_location}", "format": "parquet", "columns": [], "partitions": tdata[partitions_str]}
+    table_dict = {"name": table_name, "location": f"s3a://{S3_BUCKET}/{table_location}", "format": "parquet", "columns": [], "partitions": tdata[partitions_str]}
     for col in df.columns:
         table_dict["columns"].append(col)
     schema_def["tables"].append(table_dict)
