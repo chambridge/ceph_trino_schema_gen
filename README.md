@@ -2,7 +2,7 @@
 Generate Trino schema from an Ceph S3 bucket
 
 
-# Getting Started
+# Usage
 
 Start by cloning the repository:
 ```
@@ -35,6 +35,7 @@ Execute the python script:
 python gen_table_defs.py
 ```
 
+# Workaround
 _Note:_ You may encounter the following error with Python 3.9 if the dependency has not been fixed yet:
 ```
 AttributeError: 'xml.etree.ElementTree.Element' object has no attribute 'getchildren'
