@@ -23,6 +23,12 @@ S3_BUCKET_PREFIX = os.getenv("S3_BUCKET_PREFIX")
 TMPDIR = os.getenv("TMPDIR")
 SCHEMA_NAME = os.getenv("SCHEMA_NAME")
 OUTPUT_FILE = os.getenv("OUTPUT_FILE")
+DATATYPE_INDEX = {
+    "object": "VARCHAR",
+    "datetime64[ns, UTC]": "TIMESTAMP",
+    "float64": "DOUBLE"
+}
+
 
 cfg = Config()
 cfg.access_key=AWS_ACCESS_KEY
@@ -37,7 +43,7 @@ prefix = uri.object()
 dir_str = "DIR"
 data_dict = {}
 partitions_str = "partitions"
-schema_def = {"schema": f"{SCHEMA_NAME}}", "tables": []}
+schema_def = {"schema": f"{SCHEMA_NAME}", "tables": []}
 
 
 def download_file(s3, uri, destination):
@@ -109,8 +115,9 @@ for table_location, tdata in data_dict.items():
     df = parquet_data.to_pandas()
     table_dict = {"name": table_name, "location": f"s3a://{S3_BUCKET}/{table_location}", "format": "parquet", "columns": [], "partitions": tdata[partitions_str]}
     for col in df.columns:
-        table_dict["columns"].append(col)
+        data_type = df.dtypes[col]
+        table_dict["columns"].append(f"{col} {DATATYPE_INDEX.get(data_type, 'VARCHAR')}")
     schema_def["tables"].append(table_dict)
 
-with open(f"./{OUTPUT_FILE}}", "w") as file:
+with open(f"./{OUTPUT_FILE}", "w") as file:
     documents = yaml.dump(schema_def, file)
