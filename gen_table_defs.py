@@ -106,6 +106,8 @@ for table_location, tdata in data_dict.items():
     if table_location.endswith("/"):
         table_location = table_location[:-1]
     table_name = table_location.replace(S3_BUCKET_PREFIX, "").replace("/", "_")
+    if table_name[0].isdigit():
+        table_name = "DATA_" + table_name
     filepath = tdata["file"]
     file_name = filepath.split("/")[-1]
     destination = f"{TMPDIR}/{file_name}"
