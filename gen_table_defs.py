@@ -87,13 +87,10 @@ def list_bucket(cfg, s3, bucket, prefix, data_dict, location=None):
             if first_partition:
                 table_name = prefix
                 data_dict[table_name] = {partitions_str: []}
-            
-            data_dict[table_name][partitions_str].append(partition[0])
+            if partition[0] not in data_dict[table_name][partitions_str]:
+                data_dict[table_name][partitions_str].append(partition[0])
 
         list_bucket(cfg, s3, bucket, cprefix["Prefix"], data_dict, table_name)
-
-    if table_name:
-        data_dict[table_name][partitions_str]=list(set(data_dict[table_name][partitions_str]))
 
     for object in response["list"]:
         data_dict[table_name]["file"] = object["Key"]
@@ -119,6 +116,8 @@ for table_location, tdata in data_dict.items():
     for col in df.columns:
         data_type = df.dtypes[col]
         table_dict["columns"].append(f"{col} {DATATYPE_INDEX.get(data_type, 'VARCHAR')}")
+    for col in table_dict.get("partitions", []):
+        table_dict["columns"].append(f"{col} 'VARCHAR'")
     schema_def["tables"].append(table_dict)
 
 with open(f"./{OUTPUT_FILE}", "w") as file:
